@@ -17,7 +17,7 @@
 			"param_name": "areas",
 			"type": "text",
 			"value_type": "string",
-			"default_value": "['MOs', 'CP']"
+			"default_value": "[MOs, CP]"
 		},
 		{
 			"id": "oNYP3PdS130O1E7r",
