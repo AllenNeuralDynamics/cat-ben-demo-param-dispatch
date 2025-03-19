@@ -115,7 +115,7 @@ def main():
 
     # if session_id is passed as a command line argument, we will only process that session,
     # otherwise we process all session IDs that match filtering criteria:    
-    session_ids = utils.get_df('session').n_unique('session_id')
+    session_ids = utils.get_df('session')['session_id'].unique().sort()
     logger.info(f"Found {len(session_ids)} session_ids available for use")
     
     if params.session_id is not None and params.session_id in session_ids: 
