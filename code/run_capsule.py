@@ -150,7 +150,7 @@ def main():
     elif utils.is_pipeline(): 
         # only one nwb will be available 
         available_nwb_session_ids = set(p.stem for p in utils.get_nwb_paths())
-        session_ids &= available_nwb_session_ids
+        session_ids = set(session_ids) & available_nwb_session_ids
         assert len(session_ids) <= 1, f"Expected zero or one NWB session_ids in pipeline: got {len(session_ids)}"
     
     # run function for each session, with test mode implemented:
