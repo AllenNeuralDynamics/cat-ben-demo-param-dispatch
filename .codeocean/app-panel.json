@@ -12,6 +12,14 @@
 			"default_value": "[2, 4, 8, 16]"
 		},
 		{
+			"id": "oNYP3PdS130O1E5r",
+			"name": "areas",
+			"param_name": "areas",
+			"type": "text",
+			"value_type": "string",
+			"default_value": "['MOs', 'CP']"
+		},
+		{
 			"id": "oNYP3PdS130O1E7r",
 			"name": "session_id",
 			"param_name": "session_id",

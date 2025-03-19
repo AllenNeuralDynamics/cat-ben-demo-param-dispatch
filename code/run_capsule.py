@@ -51,7 +51,8 @@ capsule that is standalone or part of a pipeline.
 class CapsuleParameters(pydantic_settings.BaseSettings):
 
     n_units_list: list[int]
-    session_id: str | None = None
+    areas: list[str]
+    session_id: str | None = None       # default behavior is to run for all sessions found in data asset
     logging_level: str | int = 'INFO'
     test: bool = False
 
@@ -74,10 +75,14 @@ class CapsuleParameters(pydantic_settings.BaseSettings):
             pydantic_settings.CliSettingsSource(settings_cls, cli_parse_args=True),
         )
 
+class ProcessingParameters(pydantic.BaseModel):
+    session_id: str
+    area: str
+    n_units: int
 
 # processing function ---------------------------------------------- #
 # modify the body of this function, but keep the same signature
-def process_session(params: CapsuleParameters) -> None:
+def write_parameter_sets(params: CapsuleParameters) -> None:
     """Process a single session with parameters defined in `app_params` and save results + app_params to
     /results.
     
@@ -87,20 +92,23 @@ def process_session(params: CapsuleParameters) -> None:
     logger.info(f"Processing {params!r}")
     
     # Process data here, with test mode implemented to break out of the loop early or use reduced param set:
-    for idx, n_units in enumerate(params.n_units_list):
+    idx = 0
+    for areas in params.areas:
+        for n_units in params.n_units:
+            # Save data to files in /results
+            # If the same name is used across parallel runs of this capsule in a pipeline, a name clash will
+            # occur and the pipeline will fail, so use params.session_id as filename prefix:
+            #   /results/<sessionId>.suffix
+            
+            output_path = pathlib.Path('/results') / f'{params.session_id}_input_parameters_{idx}.json'
+            logger.info(f"Writing {output_path}")
 
-        # Save data to files in /results
-        # If the same name is used across parallel runs of this capsule in a pipeline, a name clash will
-        # occur and the pipeline will fail, so use params.session_id as filename prefix:
-        #   /results/<sessionId>.suffix
-        
-        output_path = pathlib.Path('/results') / f'{params.session_id}_input_parameters_{idx}.json'
-        logger.info(f"Writing {output_path}")
+            if params.test:
+                logger.info("TEST | Exiting after writing first parameter set")
+                break
 
-        if params.test:
-            logger.info("TEST | Exiting after writing first parameter set")
-            break
-        
+            idx += 1
+            
 # ------------------------------------------------------------------ #
 
 
@@ -133,7 +141,7 @@ def main():
     logger.info(f"Launching processing loop with list of {len(session_ids)} session_ids")
     for session_id in session_ids:
         try:
-            process_session(params=CapsuleParameters(session_id=session_id))
+            write_parameter_sets(params=CapsuleParameters(session_id=session_id))
         except Exception as e:
             logger.exception(f'{session_id} | Failed:')
         else:
