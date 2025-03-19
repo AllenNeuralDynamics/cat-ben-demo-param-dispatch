@@ -9,7 +9,7 @@
 			"description": "List containing numbers of units to include in analysis, which will be iterated over",
 			"type": "text",
 			"value_type": "string",
-			"default_value": "[2, 4, 8, 16]"
+			"default_value": "[2, 16]"
 		},
 		{
 			"id": "oNYP3PdS130O1E5r",

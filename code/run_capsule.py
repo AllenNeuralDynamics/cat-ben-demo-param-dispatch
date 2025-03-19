@@ -14,6 +14,7 @@ import copy
 
 # 3rd-party imports necessary for processing ----------------------- #
 import polars as pl
+import pydantic
 import pydantic_settings
 import pydantic_settings.sources
 
@@ -93,15 +94,22 @@ def write_parameter_sets(params: CapsuleParameters) -> None:
     
     # Process data here, with test mode implemented to break out of the loop early or use reduced param set:
     idx = 0
-    for areas in params.areas:
-        for n_units in params.n_units:
-            # Save data to files in /results
+    for area in params.areas:
+        for n_units in params.n_units_list:
+
+            processing_parameters = ProcessingParameters(
+                area=area,
+                n_units=n_units,
+                session_id=params.session_id,
+            )
+            # Save to files in /results
             # If the same name is used across parallel runs of this capsule in a pipeline, a name clash will
             # occur and the pipeline will fail, so use params.session_id as filename prefix:
             #   /results/<sessionId>.suffix
-            
-            output_path = pathlib.Path('/results') / f'{params.session_id}_input_parameters_{idx}.json'
-            logger.info(f"Writing {output_path}")
+            output_path = pathlib.Path('/results/parameters') / f'{params.session_id}_input_parameters_{idx}.json'
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            logger.info(f"Writing {processing_parameters!r} to {output_path}")
+            output_path.write_text(processing_parameters.model_dump_json())
 
             if params.test:
                 logger.info("TEST | Exiting after writing first parameter set")
@@ -123,7 +131,7 @@ def main():
 
     # if session_id is passed as a command line argument, we will only process that session,
     # otherwise we process all session IDs that match filtering criteria:    
-    session_ids = utils.get_df('session')['session_id'].unique().sort()
+    session_ids = utils.get_df('session')['session_id'].unique().sort()[-5:]
     logger.info(f"Found {len(session_ids)} session_ids available for use")
     
     if params.session_id is not None and params.session_id in session_ids: 
@@ -150,7 +158,7 @@ def main():
         if params.test:
             logger.info("TEST | Exiting after first session")
             break
-    utils.ensure_nonempty_results_dirs('/results') # required for pipeline to work in case this session has no outputs
+    utils.ensure_nonempty_results_dirs('/results/parameters') # required for pipeline to work in case there are no outputs
     logger.info(f"Time elapsed: {time.time() - t0:.2f} s")
     
 
