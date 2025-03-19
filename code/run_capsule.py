@@ -133,14 +133,15 @@ def main():
     session_ids = (
         utils.get_df('units', lazy=True)
         .filter(
+            pl.col('structure').is_in(params.areas), 
             pl.col('unit_id').count().gt(20).over('session_id', 'structure'),
-            pl.col('structure').is_in(params.areas),
         )
-        .select('session_id')
+        .group_by('session_id')
+        .agg(pl.all())
+        .filter(pl.col('structure').list.n_unique() == len(params.areas))
         .collect()
-        .sample(3)
+        .sample(3) # limit number of sessions for purpose of demo 
         .get_column('session_id')
-        .unique()
         .sort()
     )
     logger.info(f"Found {len(session_ids)} session_ids available for use")
