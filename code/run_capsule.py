@@ -134,17 +134,19 @@ def main():
         utils.get_df('units', lazy=True)
         .filter(
             pl.col('structure').is_in(params.areas), 
-            pl.col('unit_id').count().gt(20).over('session_id', 'structure'),
+            pl.col('unit_id').len().gt(20).over('session_id', 'structure'),
         )
-        .group_by('session_id')
-        .agg(pl.all())
-        .filter(pl.col('structure').list.n_unique() == len(params.areas))
+        .filter(
+            pl.col('structure').n_unique().eq(len(areas)).over('session_id'),
+        )
         .collect()
-        .sample(3) # limit number of sessions for purpose of demo 
         .get_column('session_id')
-        .sort()
+        .unique()
     )
-    logger.info(f"Found {len(session_ids)} session_ids available for use")
+    logger.info(f"Found {len(session_ids)} session_ids matching criteria")
+
+    session_ids = session_ids.sample(3) 
+    logger.info(f"Limiting number of session_ids to {len(session_ids)} for demo")
     
     if params.session_id is not None and params.session_id in session_ids: 
         logger.info(f"Using single session_id {params.session_id}")
