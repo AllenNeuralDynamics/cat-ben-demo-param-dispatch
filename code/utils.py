@@ -6,6 +6,7 @@ import concurrent.futures
 import contextlib
 import dataclasses
 import datetime
+import glob
 import json
 import functools
 import logging
@@ -164,7 +165,12 @@ def get_datacube_dir() -> pathlib.Path:
 
 @functools.cache
 def get_nwb_paths() -> tuple[pathlib.Path, ...]:
-    return tuple(get_data_root().rglob('*.nwb'))
+    nwb_paths = tuple(glob.glob(f"{get_data_root()}/**/*.nwb", recursive=True))
+    if len(nwb_paths) < 100:
+        logger.info(f"Found NWB paths: {nwb_paths}")
+    else:
+        logger.info(f"Found {len(nwb_paths)} NWB paths")
+    return tuple(pathlib.Path(p) for p in nwb_paths)
 
 def ensure_nonempty_results_dirs(dirs: str | Iterable[str] = '/results') -> None:
     """A pipeline run can crash if a results folder is expected and not found or is empty 
