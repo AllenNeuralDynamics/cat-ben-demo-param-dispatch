@@ -122,6 +122,49 @@ def setup_logging(
     logging.basicConfig(level=level, handlers=handlers)
 
 
+# data access ------------------------------------------------------- #    
+
+def get_df(component: str) -> pl.DataFrame:
+    path = get_datacube_dir() / 'consolidated' / f'{component}.parquet'
+    return (
+        pl.read_parquet(path)
+        .with_columns(
+            pl.col('session_id').str.split('_').list.slice(0, 2).list.join('_')
+        )
+    )
+
+# paths ----------------------------------------------------------- #
+
+@functools.cache
+def get_data_root(as_str: bool = False) -> pathlib.Path:
+    expected_paths = ('/data', '/tmp/data', )
+    for p in expected_paths:
+        if (data_root := pathlib.Path(p)).exists():
+            logger.debug(f"Using {data_root=}")
+        return data_root.as_posix() if as_str else data_root
+    else:
+        raise FileNotFoundError(f"data dir not present at any of {expected_paths=}")
+
+@functools.cache
+def get_datacube_dir() -> pathlib.Path:
+    for p in sorted(get_data_root().iterdir(), reverse=True): # in case we have multiple assets attached, the latest will be used
+        if p.is_dir() and p.name.startswith('dynamicrouting_datacube'):
+            path = p
+            break
+    else:
+        for p in get_data_root().iterdir():
+            if any(pattern in p.name for pattern in ('session_table', 'nwb', 'consolidated', )):
+                path = get_data_root()
+                break
+        else:
+            raise FileNotFoundError(f"Cannot determine datacube dir: {list(get_data_root().iterdir())=}")
+    logger.debug(f"Using files in {path}")
+    return path
+
+@functools.cache
+def get_nwb_paths() -> tuple[pathlib.Path, ...]:
+    return tuple(get_data_root().rglob('*.nwb'))
+
 def ensure_nonempty_results_dirs(dirs: str | Iterable[str] = '/results') -> None:
     """A pipeline run can crash if a results folder is expected and not found or is empty 
     - ensure that a non-empty folder exists by creating a unique file"""
