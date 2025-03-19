@@ -20,6 +20,8 @@ import uuid
 import zoneinfo
 from typing import Any, Generator, Iterable, Literal
 
+import polars as pl
+
 
 logger = logging.getLogger(__name__)
 
