@@ -12,7 +12,7 @@ import uuid
 from typing import Any, Literal
 import copy 
 
-# 3rd-party imports necessary for processing ----------------------- #
+# 3rd-party imports ------------------------ ----------------------- #
 import polars as pl
 import pydantic
 import pydantic_settings
@@ -77,12 +77,12 @@ class CapsuleParameters(pydantic_settings.BaseSettings):
         )
 
 class ProcessingParameters(pydantic.BaseModel):
+    """Input parameters for a processing capsule, which will be launched downstream of this capsule in a pipeline"""
     session_id: str
     area: str
     n_units: int
 
-# processing function ---------------------------------------------- #
-# modify the body of this function, but keep the same signature
+
 def write_parameter_sets(params: CapsuleParameters) -> None:
     """Process a single session with parameters defined in `app_params` and save results + app_params to
     /results.
@@ -145,8 +145,8 @@ def main():
         session_ids &= available_nwb_session_ids
         assert len(session_ids) <= 1, f"Expected zero or one NWB session_ids in pipeline: got {len(session_ids)}"
     
-    # run processing function for each session, with test mode implemented:
-    logger.info(f"Launching processing loop with list of {len(session_ids)} session_ids")
+    # run function for each session, with test mode implemented:
+    logger.info(f"Launching parameter generation loop with list of {len(session_ids)} session_ids")
     for session_id in session_ids:
         try:
             write_parameter_sets(params=CapsuleParameters(session_id=session_id))
