@@ -35,3 +35,6 @@ each parameters file is then passed to a parallel instance of the processing cap
 ```python
 process(parameters_file)
 ```
+
+Because we still want to be able to use the processing capsule in standalone mode (for testing, or one-off analyses) we need to be able to switch between getting parameters from the app panel (via CLI args) or from a parameters file, when available.
+To do this we set up a parameters class derived from `pydantic_settings.BaseSettings`, which can get input from different sources, and then prioritize file input over CLI args.
