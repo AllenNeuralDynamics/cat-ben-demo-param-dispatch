@@ -133,14 +133,15 @@ def main():
     session_ids = (
         utils.get_df('units', lazy=True)
         .filter(
-            pl.col('unit_id').filter(pl.col('structure').is_in(params.areas)).count().gt(20).over('session_id'),
+            pl.col('structure').count().gt(20).over('session_id'),
+            pl.col('structure').is_in(params.areas),
         )
         .select('session_id')
         .collect()
         .get_column('session_id')
         .unique()
         .sort()
-    )[-5:]
+    )[-3:]
     logger.info(f"Found {len(session_ids)} session_ids available for use")
     
     if params.session_id is not None and params.session_id in session_ids: 
