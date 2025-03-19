@@ -126,14 +126,13 @@ def setup_logging(
 
 # data access ------------------------------------------------------- #    
 
-def get_df(component: str) -> pl.DataFrame:
+def get_df(component: str, lazy: bool = False) -> pl.DataFrame:
     path = get_datacube_dir() / 'consolidated' / f'{component}.parquet'
-    return (
-        pl.read_parquet(path)
-        .with_columns(
-            pl.col('session_id').str.split('_').list.slice(0, 2).list.join('_')
-        )
-    )
+    if lazy:
+        frame = pl.scan_parquet(path)
+    else:
+        frame = pl.read_parquet(path)
+    return frame
 
 # paths ----------------------------------------------------------- #
 
