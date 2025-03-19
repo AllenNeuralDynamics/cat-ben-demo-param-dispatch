@@ -132,10 +132,12 @@ def main():
     # if session_id is passed as a command line argument, we will only process that session,
     # otherwise we process all session IDs that match filtering criteria:    
     session_ids = (
-        utils.get_df('units')
+        utils.get_df('units', lazy=True)
         .filter(
             pl.col('unit_id').filter(pl.col('structure').is_in(params.areas)).count().gt(20).over('session_id'),
         )
+        .select('session_id')
+        .collect()
         .get_column('session_id')
         .unique()
         .sort()
