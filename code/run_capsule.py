@@ -133,7 +133,7 @@ def main():
     session_ids = (
         utils.get_df('units', lazy=True)
         .filter(
-            pl.col('structure').count().gt(20).over('session_id'),
+            pl.col('unit_id').count().gt(20).over('session_id', 'structure'),
             pl.col('structure').is_in(params.areas),
         )
         .select('session_id')
