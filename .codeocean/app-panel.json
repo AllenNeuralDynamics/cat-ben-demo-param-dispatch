@@ -5,7 +5,7 @@
 		{
 			"id": "CKVquiTjW2bADhJp",
 			"name": "n_units_list",
-			"param_name": "n_units",
+			"param_name": "n_units_list",
 			"description": "List containing numbers of units to include in analysis, which will be iterated over",
 			"type": "text",
 			"value_type": "string",
