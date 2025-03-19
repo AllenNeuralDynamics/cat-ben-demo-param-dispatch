@@ -18,8 +18,10 @@
 		"pip3": {
 			"packages": [
 				{
-					"name": "pydantic_settings",
-					"version": "2.8.1"
+					"name": "polars[plot]"
+				},
+				{
+					"name": "pydantic-settings"
 				}
 			],
 			"options": {},

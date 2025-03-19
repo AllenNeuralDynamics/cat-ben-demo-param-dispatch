@@ -3,6 +3,22 @@
 	"named_parameters": true,
 	"parameters": [
 		{
+			"id": "CKVquiTjW2bADhJp",
+			"name": "n_units_list",
+			"param_name": "n_units",
+			"description": "List containing numbers of units to include in analysis, which will be iterated over",
+			"type": "text",
+			"value_type": "string",
+			"default_value": "[2, 4, 8, 16]"
+		},
+		{
+			"id": "oNYP3PdS130O1E7r",
+			"name": "session_id",
+			"param_name": "session_id",
+			"type": "text",
+			"value_type": "string"
+		},
+		{
 			"id": "HzuW2S8dqcVV1ML7",
 			"name": "logging_level",
 			"param_name": "logging_level",
@@ -20,15 +36,6 @@
 			"value_type": "integer",
 			"default_value": "1",
 			"maximum": 1
-		},
-		{
-			"id": "CKVquiTjW2bADhJp",
-			"name": "n_units_list",
-			"param_name": "n_units",
-			"description": "List containing numbers of units to include in analysis, which will be iterated over",
-			"type": "text",
-			"value_type": "string",
-			"default_value": "[2, 4, 8, 16]"
 		}
 	]
 }
