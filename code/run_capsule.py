@@ -138,10 +138,11 @@ def main():
         )
         .select('session_id')
         .collect()
+        .sample(3)
         .get_column('session_id')
         .unique()
         .sort()
-    )[-3:]
+    )
     logger.info(f"Found {len(session_ids)} session_ids available for use")
     
     if params.session_id is not None and params.session_id in session_ids: 
