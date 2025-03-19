@@ -137,7 +137,7 @@ def main():
             pl.col('unit_id').len().gt(20).over('session_id', 'structure'),
         )
         .filter(
-            pl.col('structure').n_unique().eq(len(areas)).over('session_id'),
+            pl.col('structure').n_unique().eq(len(params.areas)).over('session_id'),
         )
         .collect()
         .get_column('session_id')
