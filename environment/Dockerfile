@@ -1,4 +1,4 @@
-# hash:sha256:73a6d3ad157d462adc2d4c0c65bccae8765bcde2049bbf285d38bdaed426a76d
+# hash:sha256:0af3bbfaed8d84cc14eb9d767037ca59f37efbccf144890e4b74e12c1bf30924
 ARG REGISTRY_HOST
 FROM $REGISTRY_HOST/codeocean/mambaforge3:23.1.0-4-python3.10.12-ubuntu22.04
 
@@ -14,5 +14,5 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install -U --no-cache-dir \
-    polars[plot] \
-    pydantic-settings
+    polars[plot]==1.25.2 \
+    pydantic-settings==2.8.1
